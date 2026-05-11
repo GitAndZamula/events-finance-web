@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Афиша мероприятий</h1>
+
+    <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn btn-outline-secondary active" id="gridViewBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+            </svg>
+            Карточки
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="tableViewBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M3 12h18M3 18h18"></path>
+            </svg>
+            Таблица
+        </button>
+    </div>
+</div>
+
+<div id="gridView">
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 overflow-hidden">
+                <a href="{{ url_for('main.event_detail', event_id=event.id) }}" class="text-decoration-none">
+                    <div class="card-title-bg p-2 text-center border-bottom">
+                        <h5 class="card-title text-dark fw-bold mb-1">{{ event.name }}</h5>
+                        <div class="text-muted small">
+                            {{ event.event_date }} | {{ event.activity_type }}
+                        </div>
+                    </div>
+
+                    <div class="text-center" style="height: 250px; overflow: hidden;">
+                        {% if event.image_path %}
+                            <img src="{{ url_for('static', filename=event.image_path) }}"
+                                 alt="{{ event.name }}"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center h-100">
+                                <span>Нет изображения</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <span class="badge">{{ event.planned_participants or 0 }} участников</span>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-6 text-start">
+                                <small class="text-muted">Себестоимость:</small>
+                                <div class="fw-bold">{{ "%.2f"|format(event.self_cost or 0) }}</div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted">Стоимость:</small>
+                                <div class="fw-bold">{{ "%.2f"|format(event.participation_cost or 0) }}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-6 text-start">
+                                <small class="text-muted">Расход:</small>
+                                <div class="fw-bold">{{ "%.2f"|format(event.total_expenses or 0) }}</div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <small class="text-muted">Доход:</small>
+                                {% set income = (event.participation_cost or 0) * ((event.planned_participants or 0) - (event.discount_cards_count or 0)) %}
+                                <div class="fw-bold">{{ "%.2f"|format(income) }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer-bg p-2 text-center border-top">
+                        <div class="fw-bold fs-5 {% if event.profit and event.profit < 0 %}text-danger{% else %}text-success{% endif %}">
+                            {% if event.profit and event.profit < 0 %}
+                                УБЫТОК: {{ "%.2f"|format(event.profit or 0) }}
+                            {% else %}
+                                ПРИБЫЛЬ: {{ "%.2f"|format(event.profit or 0) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% else %}
+            <div class="col-12">
+                <p class="text-center">Мероприятий пока нет</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="tableView" style="display: none;">
+    <div class="table-container">
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Название</th>
+                    <th>Дата</th>
+                    <th>Кол-во</th>
+                    <th>Себест-ть</th>
+                    <th>Стоимость</th>
+                    <th>Расход</th>
+                    <th>Доход</th>
+                    <th>Прибыль</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr style="cursor: pointer;" ondblclick="window.location='{{ url_for('main.event_detail', event_id=event.id) }}'">
+                    <td>
+                        {% if event.image_path %}
+                            <img src="{{ url_for('static', filename=event.image_path) }}"
+                                 alt="{{ event.name }}"
+                                 class="rounded-circle"
+                                 style="width: 36px; height: 36px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 36px; height: 36px;">
+                                <small>Нет</small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('main.event_detail', event_id=event.id) }}" class="text-decoration-none fw-bold text-dark">
+                            {{ event.name }}
+                        </a>
+                    </td>
+                    <td style="white-space: nowrap;">
+                        {{ event.event_date }}
+                    </td>
+                    <td class="text-center">{{ event.planned_participants or 0 }}</td>
+                    <td class="text-end">{{ "%.2f"|format(event.self_cost or 0) }}</td>
+                    <td class="text-end">{{ "%.2f"|format(event.participation_cost or 0) }}</td>
+                    <td class="text-end">{{ "%.2f"|format(event.total_expenses or 0) }}</td>
+                    <td class="text-end">
+                        {% set income = (event.participation_cost or 0) * ((event.planned_participants or 0) - (event.discount_cards_count or 0)) %}
+                        {{ "%.2f"|format(income) }}
+                    </td>
+                    <td class="text-end {% if event.profit and event.profit < 0 %}text-danger fw-bold{% else %}text-success fw-bold{% endif %}">
+                        {{ "%.2f"|format(event.profit or 0) }}
+                    </td>
+                  </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center py-4">Мероприятий пока нет</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="6" class="text-end">ИТОГО:</td>
+                    <td class="text-end">{{ "%.2f"|format(events|sum(attribute='total_expenses')|float) }}</td>
+                    {% set total_income = namespace(value=0) %}
+                    {% for event in events %}
+                        {% set income = (event.participation_cost or 0) * ((event.planned_participants or 0) - (event.discount_cards_count or 0)) %}
+                        {% set total_income.value = total_income.value + income %}
+                    {% endfor %}
+                    <td class="text-end">{{ "%.2f"|format(total_income.value) }}</td>
+                    <td class="text-end {% if events|sum(attribute='profit')|float < 0 %}text-danger{% else %}text-success{% endif %}">
+                        {{ "%.2f"|format(events|sum(attribute='profit')|float) }}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}
