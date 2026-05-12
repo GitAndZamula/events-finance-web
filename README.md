@@ -177,17 +177,17 @@ python run.py
 ### Скриншоты
 
 Главная страница (Карточки) - Отображение мероприятий в виде карточек с изображениями и финансовыми показателями.
-![index_cards.png](index_cards.png)
+![index_cards.png](doc_images/index_cards.png)
 Главная страница (Таблица) - Табличное представление с сортировкой и итоговыми суммами.
-![index_table.png](index_table.png)
+![index_table.png](doc_images/index_table.png)
 Форма мероприятия - Три вкладки: основная информация, финансовый расчет (с возможностью добавления статей расходов), участники и расчет.
-![event_1.png](event_1.png)
-![event_2.png](event_2.png)
-![event_3.png](event_3.png)
+![event_1.png](doc_images/event_1.png)
+![event_2.png](doc_images/event_2.png)
+![event_3.png](doc_images/event_3.png)
 Страница деталей - Полная информация о мероприятии с вкладками расходов и расчетов.
-![detail_1.png](detail_1.png)
-![detail_2.png](detail_2.png)
-![detail_3.png](detail_3.png)
+![detail_1.png](doc_images/detail_1.png)
+![detail_2.png](doc_images/detail_2.png)
+![detail_3.png](doc_images/detail_3.png)
 ## API Endpoints
 
 ```text
